@@ -1,7 +1,11 @@
 (ns midara.core
-  (:gen-class))
+  (:gen-class)
+  (:use ring.adapter.jetty))
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "Midara CI Server."
   [& args]
-  (println "Hello, World!"))
+  (println "Starting server..."))
+  ;(run-jetty app {:port 3000})
+
+
