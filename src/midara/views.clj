@@ -2,16 +2,6 @@
   (:gen-class)
   (:use clojure.core [hiccup core page]))
 
-(defn index-page []
-  (html5
-    [:head
-      [:title "Midara"]
-      (include-css "/css/style.css")]
-    [:body
-      [:h1 "Midara"]
-      [:p "Simply setup your webhook to midara/hook"]
-    ]))
-
 (defn get-hook []
   (html5
     [:head

@@ -1,0 +1,23 @@
+{
+  "name": "midata",
+  "version": "0.0.1",
+  "description": "Midara: a CI server",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NotyIm/midara.git"
+  },
+  "author": "Vinh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NotyIm/midara/issues"
+  },
+  "homepage": "https://github.com/NotyIm/midara#readme"
+}
