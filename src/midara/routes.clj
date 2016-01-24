@@ -12,8 +12,9 @@
 
 (defroutes main-routes
   (GET "/" [] (index/index))
-  (GET "/hook" [] (hook/get-hook))
   (POST "/hook" {body :body} (hook/post-hook body))
+  (GET "/hook" {body :body} (hook/post-hook body))
+  ;(GET "/hook" [] (hook/get-hook))
   (route/resources "/")
   (route/not-found "page not found"))
 
