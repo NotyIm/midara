@@ -5,14 +5,15 @@
         midara.views)
   (:require
             [midara.views.index :as index]
+            [midara.views.hook :as hook]
             [compojure.route :as route]
             [compojure.handler :as handler]
             [compojure.response :as response]))
 
 (defroutes main-routes
   (GET "/" [] (index/index))
-  (GET "/hook" [] (get-hook))
-  (POST "/hook" {body :body} (post-hook body))
+  (GET "/hook" [] (hook/get-hook))
+  (POST "/hook" {body :body} (hook/post-hook body))
   (route/resources "/")
   (route/not-found "page not found"))
 

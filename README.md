@@ -18,6 +18,16 @@ FIXME: explanation
 
     $ java -jar midara-0.1.0-standalone.jar [args]
 
+## Directory structure
+
+- username
+    * repo
+      * code
+      * jobs
+        * job-id
+          - log
+
+
 ## Options
 
 FIXME: listing of options this app accepts.
