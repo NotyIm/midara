@@ -1,5 +1,5 @@
 (ns midara.core
-  (:gen-class)
+  (:gen-classs)
   (:use ring.adapter.jetty))
 
 (defn -main

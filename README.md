@@ -1,12 +1,32 @@
 # midara
 
-A very simple CI server
+A very simple CI server.
+
+# Warning
+
+I used it to build noty.im infrastructure. However, since it runs shell, it's
+best to run Midara in a private, heavily firewall network.
+
+Currently I only allow build from Github.
 
 # Why
 
-Tired of using YAML file in CI. This CI bring back the power of bash. Yes, you write bash script to run build/deploy.
+Tired of using YAML file in CI. This CI bring back the power of bash. Yes, you
+write bash script to run build/deploy. The CI, however, exposed a set of bash
+function you can use.
 
-The CI, however, exposed a set of bash function you can use.
+When receiving a web hook, Midara gather information about the commit (repo,
+owner, user, commit, branch, pr...), create a workspace, checkout your code
+into that workspace, source your build script with `source .midara`.
+
+
+# Shell structure:
+
+You have to export a variable name `DOCKER_IMAGE`.
+
+# Build process
+
+The build is kicked off by in
 
 ## Installation
 

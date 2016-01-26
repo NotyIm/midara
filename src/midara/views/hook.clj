@@ -14,10 +14,10 @@
 
 (defn post-hook
   ; Process hook posting
-  [body]
+  [headers body]
   (let [b (json/read-str (slurp body)
                          :key-fn keyword)]
-    (builder/start b)
+    (builder/start headers b)
     (html5
       [:head
         [:title "Midara Hook"]
