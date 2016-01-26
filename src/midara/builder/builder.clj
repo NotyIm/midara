@@ -6,6 +6,11 @@
               :as a
               :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
 
+(defn read-meta
+  ; Parse meta information
+  [file]
+  (json/read-str (slurp file) :key-fn keyword))
+
 (defn -description
   ; Get description for build
   [state]
@@ -25,12 +30,6 @@
   ))
 
 (defn -execute
-  ; Execute build script.
-  [repo]
-  (println repo)
-  )
-
-(defn -execute
   ; Execute build
   [args]
   (let [owner (get-in args [:repository :owner :name])
@@ -40,13 +39,16 @@
     (def workspace (str pwd "/workspace"))
     (def workdir (clojure.string/join "/" [workspace owner name commit]))
     (def build-log (str workdir "/build/midara-build.log"))
+    (def hook-manifest (str workdir "/build/hook-manifest.log"))
     (println (map #(.mkdir (java.io.File. %))
           [workspace (clojure.string/join "/" [workspace owner]) (clojure.string/join "/" [workspace owner name]) workdir (clojure.string/join "/" [workdir "src"]) (clojure.string/join "/" [workdir "build"])]))
 
-    (println "Build with command: echo " args  build-log "; sleep 15"))
+    (spit hook-manifest args)
+
+    (println "Build with command: echo " args  build-log "; sleep 15")
     (println (System/getProperty "user.dir"))
     (println (-> (java.io.File. ".") .getAbsolutePath))
-    (sh "sh" "-c" (str "echo " args "> " build-log "; sleep 15")))
+    (sh "sh" "-c" (str "echo " args "> " build-log "; sleep 15"))))
 
 (defn build
   ; Start the build process
