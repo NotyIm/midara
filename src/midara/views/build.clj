@@ -12,6 +12,7 @@
   (println meta-file)
   (def buildlog-file (str workspace "/build/midara-build.log"))
   (def hook-meta (builder/read-meta meta-file))
+  (def build-result (builder/read-result owner repo rev))
   (html5
     [:head
       [:title "Midara Hook"]
@@ -36,7 +37,8 @@
 
         [:section.container
           [:h5.title (str "Build " owner "/" repo ": " rev)]
-          [:p "Trigger by " (get-in hook-meta [:head_commit :author :username])]
+          [:p "Trigger by: " (get-in hook-meta [:head_commit :author :username])]
+          [:p "Build result: " (if (= 0 (build-result :exit)) "success" "fail")]
           [:div.example
             [:pre.code.prettyprint.prettyprinted (slurp buildlog-file)]]
         ]
