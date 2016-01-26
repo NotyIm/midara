@@ -2,6 +2,7 @@
     (:gen-class)
     (:use [clojure.java.shell :only [sh]])
     (require [tentacles.repos :as repos]
+             [clojure.data.json :as json]
              [clojure.core.async
               :as a
               :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
@@ -10,6 +11,11 @@
   ; Parse meta information
   [file]
   (json/read-str (slurp file) :key-fn keyword))
+
+(defn write-meta
+  ; write meta information
+  [file content]
+  (spit file (json/write-str content)))
 
 (defn -description
   ; Get description for build
@@ -43,7 +49,7 @@
     (println (map #(.mkdir (java.io.File. %))
           [workspace (clojure.string/join "/" [workspace owner]) (clojure.string/join "/" [workspace owner name]) workdir (clojure.string/join "/" [workdir "src"]) (clojure.string/join "/" [workdir "build"])]))
 
-    (spit hook-manifest args)
+    (write-meta hook-manifest args)
 
     (println "Build with command: echo " args  build-log "; sleep 15")
     (println (System/getProperty "user.dir"))

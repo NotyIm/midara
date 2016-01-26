@@ -7,7 +7,11 @@
 (defn view
   ; render view buld page
   [owner repo rev]
-
+  (def workspace (clojure.string/join "/" ["workspace" owner repo rev]))
+  (def meta-file (str workspace "/build/hook-manifest.log"))
+  (println meta-file)
+  (def buildlog-file (str workspace "/build/midara-build.log"))
+  (def hook-meta (builder/read-meta meta-file))
   (html5
     [:head
       [:title "Midara Hook"]
@@ -32,8 +36,9 @@
 
         [:section.container
           [:h5.title (str "Build " owner "/" repo ": " rev)]
+          [:p "Trigger by " (get-in hook-meta [:head_commit :author :username])]
           [:div.example
-            [:pre.code.prettyprint.prettyprinted (slurp (clojure.string/join "/" ["workspace" owner repo rev "build/midara-build.log"]))]]
+            [:pre.code.prettyprint.prettyprinted (slurp buildlog-file)]]
         ]
       ]]
   )
