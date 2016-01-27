@@ -17,6 +17,18 @@
   [file content]
   (spit file (json/write-str content)))
 
+(defn write-result
+  ; write build result
+  [owner repo commit r]
+  (let [file (clojure.string/join "/" ["workspace" owner repo commit "build/midara-result.json"])]
+    (spit file (json/write-str r))))
+
+(defn read-result
+  ; read build result
+  [owner repo commit]
+  (let [file (clojure.string/join "/" ["workspace" owner repo commit "build/midara-result.json"])]
+    (json/read-str (slurp file) :key-fn keyword)))
+
 (defn -description
   ; Get description for build
   [state]
@@ -68,13 +80,15 @@
         (if (= 200 (result :status))
           (println "Fail to create status. Abandon build")
           (go (let [build-result (-execute args)]
-            (if (= 0 (build-result :exit))
-              (do
-                (println "Build succesful")
-                (let [status-result (set-status owner name commit "success")]
-                  (println (str "creating result: " status-result))))
-              (println "Build fail")
-            )))
+                (if (= 0 (build-result :exit))
+                  (do
+                    (println "Build succesful")
+                    (let [status-result (set-status owner name commit "success")]
+                      (println (str "creating result: " status-result))))
+                  (println "Build fail")
+                )
+                (write-result owner name commit build-result)
+                ))
     )))))
 
 (defn start
