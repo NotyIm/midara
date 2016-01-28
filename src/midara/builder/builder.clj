@@ -66,7 +66,7 @@
     (println "Build with command: echo " args  build-log "; sleep 15")
     (println (System/getProperty "user.dir"))
     (println (-> (java.io.File. ".") .getAbsolutePath))
-    (sh "sh" "-c" (str "echo " args "> " build-log "; sleep 15"))))
+    (sh "sh" "-c" (str "cd " workdir ";" "git clone --depth 1 git@github.com:" owner "/" name ".git; " pwd" " > " build-log "; sleep 15"))))
 
 (defn build
   ; Start the build process
