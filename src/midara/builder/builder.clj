@@ -63,10 +63,20 @@
 
     (write-meta hook-manifest args)
 
-    (println "Build with command: echo " args  build-log "; sleep 15")
-    (println (System/getProperty "user.dir"))
+    (def cmd (str "(" "cd " workdir " && " "git clone --depth 1 git@github.com:" owner "/" name ".git src && pwd" ")"))
+    (println "Build with command: " cmd " from base dir " (System/getProperty "user.dir"))
     (println (-> (java.io.File. ".") .getAbsolutePath))
-    (sh "sh" "-c" (str "cd " workdir ";" "git clone --depth 1 git@github.com:" owner "/" name ".git; " pwd" " > " build-log "; sleep 15"))))
+    (sh "echo" cmd " > " build-log)
+    ; The building process is as follow
+    ; docker exec
+    ; docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v workdir/src:/workspace run.sh
+    ; while as run.sh looke like this:
+    ;    source /workspace/.midara
+    ; then `.main` function in `.midara` is kicked off and run
+    (def docker (str "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace /run.sh"))
+    (println "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "source /workspace/.midara; main" " >> " build-log " 2>&1")
+    (sh "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "-v" "" "docker" "'source /workspace/.midara; main'" " >> " build-log " 2>&1")))
+    ;(sh "/bin/sh" "-c" (str cmd "; " docker " >> " build-log " 2>&1"))))
 
 (defn build
   ; Start the build process
