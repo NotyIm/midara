@@ -6,7 +6,5 @@
 (defn -main
   "Midara CI Server."
   [& args]
-  (println "Starting server..."))
-  (run-jetty routes/app {:port 3000})
-
-
+  (println "Starting server...")
+  (run-jetty routes/app {:port 3000}))
