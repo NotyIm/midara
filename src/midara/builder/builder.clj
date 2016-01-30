@@ -66,17 +66,17 @@
     (def cmd (str "(" "cd " workdir " && " "git clone --depth 1 git@github.com:" owner "/" name ".git src && pwd" ")"))
     (println "Build with command: " cmd " from base dir " (System/getProperty "user.dir"))
     (println (-> (java.io.File. ".") .getAbsolutePath))
-    (sh "echo" cmd " > " build-log)
+    (sh "/bin/sh" "-c" cmd " > " build-log)
     ; The building process is as follow
     ; docker exec
     ; docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v workdir/src:/workspace run.sh
     ; while as run.sh looke like this:
     ;    source /workspace/.midara
     ; then `.main` function in `.midara` is kicked off and run
-    (def docker (str "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace /run.sh"))
-    (println "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "source /workspace/.midara; main" " >> " build-log " 2>&1")
     ;(sh "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "-v" "" "docker" "'source /workspace/.midara; main'" " >> " build-log " 2>&1")))
-    (sh "/bin/sh" "-c" (str "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace docker -v " pwd "/resources/scripts/build:/build /build >> " build-log " 2>&1"))))
+    (def docker (str "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build > " build-log " 2>&1"))
+    (println docker)
+    (sh "/bin/sh" "-c" docker)))
 
 (defn build
   ; Start the build process
