@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Any subsequent(*) commands which fail will cause the shell script to exit immediately
+set -e
+#trap command signal [signal ...]
+
 html-h1 () {
   echo -e "# $1"
 }
