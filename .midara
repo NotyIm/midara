@@ -1,5 +1,9 @@
 #!/bin/bash
 
 main () {
-  echo "main"
+  html-h4 "Build image"
+  docker build -t notyim/midara:test docker
+
+  html-h4 "Push image"
+  docker push notyim/midara:test
 }
