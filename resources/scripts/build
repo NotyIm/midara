@@ -1,0 +1,60 @@
+#!/bin/bash
+
+html-h1 () {
+  echo -e "# $1"
+}
+
+html-h2 () {
+  echo -e "## $1"
+}
+
+html-h3 () {
+  echo -e "### $1"
+}
+
+html-h4 () {
+  echo -e "#### $1"
+}
+
+html-h5 () {
+  echo -e "##### $1"
+}
+
+html-p () {
+  echo -e ""
+}
+
+html-cmd () {
+  echo -e "\$ $1"
+}
+
+html-report-warning () {
+  echo -e "$1"
+}
+
+html-report-success () {
+  echo -e "$1"
+}
+
+html-h5 "Start build"
+
+html-cmd "source .midara"
+
+# Start the build in workspace folder
+cd /workspace
+
+source ".midara"
+
+html-cmd "main"
+
+output=$(main)
+rc="$?"
+
+echo -e "$output"
+
+if [ "$rc" -eq "0" ]; then
+  html-report-success "Build ok"
+else
+  html-report-success "Build failed"
+fi
+exit $rc
