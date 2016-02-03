@@ -1,6 +1,7 @@
 (ns midara.builder.builder
     (:gen-class)
-    (:use [clojure.java.shell :only [sh]])
+    (:use [clojure.java.shell :only [sh]]
+          clojure.java.io)
     (require [tentacles.repos :as repos]
              [clojure.data.json :as json]
              [clojure.core.async
@@ -28,6 +29,19 @@
   [owner repo commit]
   (let [file (clojure.string/join "/" ["workspace" owner repo commit "build/midara-result.json"])]
     (json/read-str (slurp file) :key-fn keyword)))
+
+(defn write-env
+  ; write build result
+  [owner repo env]
+  (let [file (clojure.string/join "/" ["workspace" owner repo "env"])]
+    (spit file env)))
+
+(defn read-env
+  ; read build result
+  [owner repo ]
+  (let [file (clojure.string/join "/" ["workspace" owner repo "env"])]
+    (if (.exists (as-file file)) (slurp file) "")
+  ))
 
 (defn -description
   ; Get description for build

@@ -2,6 +2,7 @@
   (:gen-class)
   (:use compojure.core
         [hiccup.middleware :only (wrap-base-url)]
+        [ring.middleware.params :only (wrap-params)]
         midara.views)
   (:require
             [midara.views.index :as index]
@@ -18,10 +19,12 @@
   (GET "/hook" {headers :headers body :body} (hook/post-hook headers body))
   (GET "/build/:owner/:repo/:rev{[a-z0-9]+}" [owner repo rev] (build/view owner repo rev))
   (GET "/gh/:owner/:repo" [owner repo] (project/view owner repo))
-  (POST "/gh/:owner/:repo" [owner repo] (project/save owner repo))
+  (POST "/gh/:owner/:repo" [env owner repo] (project/save env owner repo))
   (route/resources "/")
   (route/not-found "page not found"))
 
 (def app
   (-> (handler/site main-routes)
-      (wrap-base-url)))
+      (wrap-params)
+      (wrap-base-url)
+  ))
