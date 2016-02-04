@@ -69,6 +69,7 @@
           commit (get-in args [:head_commit :id])]
     (def pwd (System/getProperty "user.dir"))
     (def workspace (str pwd "/workspace"))
+    (def project-dir (str pwd "/workspace/" owner "/" name))
     (def workdir (clojure.string/join "/" [workspace owner name commit]))
     (def build-log (str workdir "/build/midara-build.log"))
     (def hook-manifest (str workdir "/build/hook-manifest.log"))
@@ -88,7 +89,7 @@
     ;    source /workspace/.midara
     ; then `.main` function in `.midara` is kicked off and run
     ;(sh "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "-v" "" "docker" "'source /workspace/.midara; main'" " >> " build-log " 2>&1")))
-    (def docker (str "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build >> " build-log " 2>&1"))
+    (def docker (str "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " project-dir "/env:/env -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build >> " build-log " 2>&1"))
     (println docker)
     (sh "/bin/sh" "-c" docker)))
 

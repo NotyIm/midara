@@ -47,6 +47,7 @@ html-cmd "source .midara"
 # Start the build in workspace folder
 cd /workspace
 
+source /env
 source ".midara"
 
 html-cmd "main"
