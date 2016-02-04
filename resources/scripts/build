@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
-set -e
+#set -e
 #trap command signal [signal ...]
 
 html-h1 () {
@@ -47,7 +47,7 @@ html-cmd "source .midara"
 # Start the build in workspace folder
 cd /workspace
 
-source /env
+source "/env"
 source ".midara"
 
 html-cmd "main"

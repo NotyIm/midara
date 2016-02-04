@@ -4,6 +4,7 @@
           clojure.java.io)
     (require [tentacles.repos :as repos]
              [clojure.data.json :as json]
+             clojure.string
              [clojure.core.async
               :as a
               :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
@@ -46,12 +47,11 @@
 (defn -description
   ; Get description for build
   [state]
-  (if (= state "pending")
-    "Midara triggered build"
-    (if (= state "sucess")
-      "Midara build succeed"
-      (str "Midara build: " state))
-  )
+  (let [desc {:pending "Midara triggered build"
+              :success "Midara build succeed"
+              :failure "Build failed"
+              :error "Build error"}]
+      (desc state))
 )
 
 (defn set-status
@@ -66,7 +66,8 @@
   [args]
   (let [owner (get-in args [:repository :owner :name])
           name (get-in args [:repository :name])
-          commit (get-in args [:head_commit :id])]
+          commit (get-in args [:head_commit :id])
+          repo-ref (args :ref)]
     (def pwd (System/getProperty "user.dir"))
     (def workspace (str pwd "/workspace"))
     (def project-dir (str pwd "/workspace/" owner "/" name))
@@ -77,8 +78,8 @@
           [workspace (clojure.string/join "/" [workspace owner]) (clojure.string/join "/" [workspace owner name]) workdir (clojure.string/join "/" [workdir "src"]) (clojure.string/join "/" [workdir "build"])]))
 
     (write-meta hook-manifest args)
-
-    (def cmd (str "(" "cd " workdir " && " "git clone --depth 1 git@github.com:" owner "/" name ".git src && pwd" ")"))
+    (def checkout-cmd (str "git fetch origin " repo-ref ":LOCAL_COMMIT"))
+    (def cmd (str "(" "cd " workdir " && " "git clone --depth 1 git@github.com:" owner "/" name ".git src && cd src && " checkout-cmd " && git checkout LOCAL_COMMIT && pwd" ")"))
     (println "Build with command: " cmd " from base dir " (System/getProperty "user.dir"))
     (println (-> (java.io.File. ".") .getAbsolutePath))
     (sh "/bin/sh" "-c" cmd " > " build-log)
@@ -89,8 +90,8 @@
     ;    source /workspace/.midara
     ; then `.main` function in `.midara` is kicked off and run
     ;(sh "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "-v" "" "docker" "'source /workspace/.midara; main'" " >> " build-log " 2>&1")))
-    (def docker (str "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " project-dir "/env:/env -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build >> " build-log " 2>&1"))
-    (println docker)
+    (def docker (str "docker run --rm -e REPO_COMMIT=" commit " -e REPO_OWNER=" (clojure.string/lower-case owner) " -e REPO_NAME=" (clojure.string/lower-case name) " -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " project-dir "/env:/env -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build >> " build-log " 2>&1"))
+    (println "\n\nDOCKER BUILD CMD " docker "\n\n")
     (sh "/bin/sh" "-c" docker)))
 
 (defn build
@@ -100,17 +101,19 @@
     (let [owner (get-in args [:repository :owner :name])
           name (get-in args [:repository :name])
           commit (get-in args [:head_commit :id])]
-      (let [result (set-status owner name commit "pending")]
-        (println (str "creating " result))
+      (let [result (set-status owner name commit :pending)]
+        (println (str "creating status for" owner name commit "get result" result))
         (if (= 200 (result :status))
           (println "Fail to create status. Abandon build")
           (go (let [build-result (-execute args)]
                 (if (= 0 (build-result :exit))
                   (do
                     (println "Build succesful")
-                    (let [status-result (set-status owner name commit "success")]
+                    (let [status-result (set-status owner name commit :success)]
                       (println (str "creating result: " status-result))))
-                  (println "Build fail")
+                  (do
+                    (println "Build fail")
+                    (set-status owner name commit :failure))
                 )
                 (write-result owner name commit build-result)
                 ))
