@@ -4,7 +4,8 @@
           clojure.java.io)
     (require [tentacles.repos :as repos]
              [clojure.data.json :as json]
-             clojure.string
+             [clojure.string :as string
+                :refer [replace join]]
              [clojure.core.async
               :as a
               :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
@@ -22,25 +23,26 @@
 (defn write-result
   ; write build result
   [owner repo commit r]
-  (let [file (clojure.string/join "/" ["workspace" owner repo commit "build/midara-result.json"])]
+  (let [file (join "/" ["workspace" owner repo commit "build/midara-result.json"])]
     (spit file (json/write-str r))))
 
 (defn read-result
   ; read build result
   [owner repo commit]
-  (let [file (clojure.string/join "/" ["workspace" owner repo commit "build/midara-result.json"])]
+  (let [file (join "/" ["workspace" owner repo commit "build/midara-result.json"])]
     (json/read-str (slurp file) :key-fn keyword)))
 
 (defn write-env
   ; write build result
   [owner repo env]
-  (let [file (clojure.string/join "/" ["workspace" owner repo "env"])]
-    (spit file env)))
+  (let [-env  (replace env "\^M" "")]
+    (let [file (join "/" ["workspace" owner repo "env"])]
+      (spit file -env))))
 
 (defn read-env
   ; read build result
   [owner repo ]
-  (let [file (clojure.string/join "/" ["workspace" owner repo "env"])]
+  (let [file (join "/" ["workspace" owner repo "env"])]
     (if (.exists (as-file file)) (slurp file) "")
   ))
 
@@ -71,11 +73,11 @@
     (def pwd (System/getProperty "user.dir"))
     (def workspace (str pwd "/workspace"))
     (def project-dir (str pwd "/workspace/" owner "/" name))
-    (def workdir (clojure.string/join "/" [workspace owner name commit]))
+    (def workdir (join "/" [workspace owner name commit]))
     (def build-log (str workdir "/build/midara-build.log"))
     (def hook-manifest (str workdir "/build/hook-manifest.log"))
     (println (map #(.mkdir (java.io.File. %))
-          [workspace (clojure.string/join "/" [workspace owner]) (clojure.string/join "/" [workspace owner name]) workdir (clojure.string/join "/" [workdir "src"]) (clojure.string/join "/" [workdir "build"])]))
+          [workspace (join "/" [workspace owner]) (join "/" [workspace owner name]) workdir (join "/" [workdir "src"]) (join "/" [workdir "build"])]))
 
     (write-meta hook-manifest args)
     (def checkout-cmd (str "git fetch origin " repo-ref ":LOCAL_COMMIT"))
