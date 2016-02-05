@@ -4,6 +4,7 @@
 #set -e
 #trap command signal [signal ...]
 
+# Output formatter
 html-h1 () {
   echo -e "# $1"
 }
@@ -40,6 +41,13 @@ html-report-success () {
   echo -e "$1"
 }
 
+# Notification function
+notify-slack () {
+  if [ ! -z "$SLACKBOT_URL" ]; then
+    curl -s --data "$1" "$SLACKBOT_URL" 2>&1
+  fi
+}
+
 html-h5 "Start build"
 
 html-cmd "source .midara"
@@ -48,6 +56,7 @@ html-cmd "source .midara"
 cd /workspace
 
 source "/env"
+notify-slack "Trigger build $REPO_OWNER/$REPO_NAME:$REPO_COMMIT"
 source ".midara"
 
 html-cmd "main"
@@ -59,7 +68,9 @@ echo -e "$output"
 
 if [ "$rc" -eq "0" ]; then
   html-report-success "Build ok"
+  notify-slack "build succeed $REPO_OWNER/$REPO_NAME:$REPO_COMMIT"
 else
   html-report-success "Build failed"
+  notify-slack "build failed $REPO_OWNER/$REPO_NAME:$REPO_COMMIT"
 fi
 exit $rc

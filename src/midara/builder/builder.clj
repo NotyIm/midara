@@ -6,7 +6,7 @@
              [clojure.data.json :as json]
              [clojure.string
                 :as string
-                :refer [str-replace join]]
+                :refer [join]]
              [clojure.core.async
               :as a
               :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
@@ -34,9 +34,9 @@
     (json/read-str (slurp file) :key-fn keyword)))
 
 (defn write-env
-  ; write build result
+  ; write env result
   [owner repo env]
-  (let [-env  (str-replace env "\^M" "")]
+  (let [-env  (string/replace env "\r" "")]
     (let [file (join "/" ["workspace" owner repo "env"])]
       (spit file -env))))
 
