@@ -2,8 +2,14 @@
 
 main () {
   html-h4 "Build image"
-  docker build -t notyim/midara:test .
+  html-cmd "docker build -t $REPO_OWNER/$REPO_NAME:$REPO_COMMIT ."
+  docker build -t "$REPO_OWNER"/"$REPO_NAME":"$REPO_COMMIT" . 2>&1
+
+  html-h4 "Login to docker"
+  html-cmd "docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS"
+  docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS 2>&1
 
   html-h4 "Push image"
-  docker push notyim/midara:test
+  html-cmd "docker push $REPO_OWNER/$REPO_NAME:$REPO_COMMIT"
+  docker push $REPO_OWNER/$REPO_NAME:$REPO_COMMIT 2>&1
 }
