@@ -4,8 +4,9 @@
           clojure.java.io)
     (require [tentacles.repos :as repos]
              [clojure.data.json :as json]
-             [clojure.string :as string
-                :refer [replace join]]
+             [clojure.string
+                :as string
+                :refer [str-replace join]]
              [clojure.core.async
               :as a
               :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
@@ -35,7 +36,7 @@
 (defn write-env
   ; write build result
   [owner repo env]
-  (let [-env  (replace env "\^M" "")]
+  (let [-env  (str-replace env "\^M" "")]
     (let [file (join "/" ["workspace" owner repo "env"])]
       (spit file -env))))
 
