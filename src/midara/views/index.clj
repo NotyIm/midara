@@ -1,6 +1,8 @@
 (ns midara.views.index
   (:gen-class)
-  (:use clojure.core [hiccup core page]))
+  (:use clojure.core [hiccup core page])
+  (:require [midara.builder.builder :as builder
+              :refer [get-projects]]))
 
 (defn index []
   (html5
@@ -27,5 +29,10 @@
 
         [:section.container
           [:p "Simply setup your webhook to send push event to midara/hook"]
-        ]]]))
+        ]
+
+        [:h4 "Current build"]
+        (map #(vector :li (vector :a {:href %} %)) (map #(.getName %) (get-projects)))
+
+        ]]))
 
