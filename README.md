@@ -5,9 +5,9 @@ A very simple CI server.
 # Warning
 
 I used it to build noty.im infrastructure. However, since it runs shell, it's
-best to run Midara in a private, heavily firewall network.
-
-Currently I only allow build from Github.
+best to run Midara in a private, heavily firewall network. You
+should also whitelist who can trigger build to prevent anyone run
+arbitrary command
 
 # Why
 
@@ -17,16 +17,17 @@ function you can use.
 
 When receiving a web hook, Midara gather information about the commit (repo,
 owner, user, commit, branch, pr...), create a workspace, checkout your code
-into that workspace, source your build script with `source .midara`.
+into that workspace, run a docker container, source your build script with `source .midara`. and invoke `main` function.
 
 
 # Shell structure:
 
-You have to export a variable name `DOCKER_IMAGE`.
+Create a file call `.midara` with a `main` function. Your code is in
+`/workspace`.
 
 # Build process
 
-The build is kicked off by in
+The build is kicked off by run a docker container. Then
 
 ## Installation
 

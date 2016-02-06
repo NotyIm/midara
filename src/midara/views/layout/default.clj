@@ -27,7 +27,9 @@
             ]
           ]
         ]
-        ] node
+        ]
+
+        node
 
         [:footer.footer
           [:section.container
