@@ -11,10 +11,20 @@
               :as a
               :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
 
+(defn get-projects
+  "List project in our workspace"
+  []
+  (let [directory (file "./workspace")]
+    (let [fs (file-seq directory)]
+      (take 10 fs)
+    )))
+
 (defn read-meta
-  ; Parse meta information
-  [file]
-  (json/read-str (slurp file) :key-fn keyword))
+  "Parse meta information"
+  [f]
+  (if (.exists (file f))
+    (json/read-str (slurp f) :key-fn keyword)
+    {}))
 
 (defn write-meta
   ; write meta information
@@ -28,10 +38,12 @@
     (spit file (json/write-str r))))
 
 (defn read-result
-  ; read build result
+  "read build result"
   [owner repo commit]
-  (let [file (join "/" ["workspace" owner repo commit "build/midara-result.json"])]
-    (json/read-str (slurp file) :key-fn keyword)))
+  (let [f (join "/" ["workspace" owner repo commit "build/midara-result.json"])]
+    (if (.exists (file f))
+      (json/read-str (slurp f) :key-fn keyword)
+      "")))
 
 (defn write-env
   ; write env result
