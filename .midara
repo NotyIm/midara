@@ -6,7 +6,6 @@ main () {
   docker build -t "$REPO_OWNER"/"$REPO_NAME":"$REPO_COMMIT" . 2>&1
 
   html-h4 "Login to docker"
-  html-cmd "docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS"
   docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS 2>&1
 
   html-h4 "Push image"
