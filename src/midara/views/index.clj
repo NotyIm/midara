@@ -2,37 +2,18 @@
   (:gen-class)
   (:use clojure.core [hiccup core page])
   (:require [midara.builder.builder :as builder
-              :refer [get-projects]]))
+              :refer [get-projects]]
+            [midara.views.layout.default :as layout]))
 
 (defn index []
-  (html5
-    [:head
-      [:title "Midara Hook"]
-      (include-css "https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css")
-      (include-css "/css/milligram.min.css")
-      (include-css "/css/style.css")]
-    [:body
-      [:main.wrapper
-        [:nav.navigation
-          [:section.container
-            [:a.navigation-title {:href "#"} "Midara"]
-            [:ul.navigation-list.float-right
-              [:li.navigation-item
-                [:a.navigation-link {:href "docs"} "Docs"]
-              ]
-              [:li.navigation-item
-                [:a.navigation-link {:href "docs"} "Support"]
-              ]
-            ]
-          ]
-        ]
-
+  (layout/render
         [:section.container
           [:p "Simply setup your webhook to send push event to midara/hook"]
         ]
 
-        [:h4 "Current build"]
-        (map #(vector :li (vector :a {:href %} %)) (map #(.getName %) (get-projects)))
-
-        ]]))
+        [:section.container
+          [:h4 "Current build"]
+          [:ul
+            (map #(vector :li (vector :a {:href (str "/gh/" %)} %)) (map #(.getName %) (get-projects)))]
+        ]))
 
