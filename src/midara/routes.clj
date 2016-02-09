@@ -19,7 +19,7 @@
   (GET "/hook" {headers :headers body :body} (hook/post-hook headers body))
   (GET "/build/:owner/:repo/:rev{[a-z0-9]+}" [owner repo rev] (build/view owner repo rev))
   (GET "/gh/:owner/:repo" [owner repo] (project/view owner repo))
-  (POST "/gh/:owner/:repo" [env owner repo] (project/save env owner repo))
+  (POST "/gh/:owner/:repo" [env owner repo untrusted-script trusted-users] (project/save {:env env :untrusted-script untrusted-script :trusted-users trusted-users} owner repo))
   (route/resources "/")
   (route/not-found "page not found"))
 

@@ -52,6 +52,19 @@
     (let [file (join "/" ["workspace" owner repo "env"])]
       (spit file -env))))
 
+(defn write-setting
+  "write setting"
+  [owner repo setting]
+  (let [-setting  (string/replace setting "\r" "")]
+    (let [file (join "/" ["workspace" owner repo "setting.json"])]
+      (spit file (json/write-str -setting)))))
+
+(defn read-setting
+  "read setting"
+  [owner repo]
+  (let [file (join "/" ["workspace" owner repo "setting.json"])]
+    (json/read-str (slurp file) :key-fn keyword)))
+
 (defn read-env
   ; read build result
   [owner repo ]
