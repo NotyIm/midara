@@ -65,6 +65,12 @@
   (let [file (join "/" ["workspace" owner repo "setting.json"])]
     (json/read-str (slurp file) :key-fn keyword)))
 
+(defn is-trusted-build?
+  "Trusted build is send by trusted user"
+  [owner repo user]
+  (let [s (read-setting owner repo)]
+    (contains? (s :trusted-users) user)))
+
 (defn read-env
   ; read build result
   [owner repo ]
@@ -118,7 +124,10 @@
     ;    source /workspace/.midara
     ; then `.main` function in `.midara` is kicked off and run
     ;(sh "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "-v" "" "docker" "'source /workspace/.midara; main'" " >> " build-log " 2>&1")))
-    (def docker (str "docker run --rm -e REPO_COMMIT=" commit " -e REPO_OWNER=" (clojure.string/lower-case owner) " -e REPO_NAME=" (clojure.string/lower-case name) " -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " project-dir "/env:/env -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build >> " build-log " 2>&1"))
+    (def docker (if (is-trusted-build? owner repo (get-in [:sender :username]))
+      (str "docker run --rm -e REPO_COMMIT=" commit " -e REPO_OWNER=" (clojure.string/lower-case owner) " -e REPO_NAME=" (clojure.string/lower-case name) " -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " project-dir "/env:/env -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build >> " build-log " 2>&1")
+      "@TODO implement untrusted build commnand here"
+      ))
     (println "\n\nDOCKER BUILD CMD " docker "\n\n")
     (sh "/bin/sh" "-c" docker)))
 
