@@ -143,8 +143,8 @@
         (println (str "creating status for" owner name commit "get result" result))
         (if (= 200 (result :status))
           (println "Fail to create status. Abandon build")
-          (def start-at (t/epoch))
-          (go (let [build-result (-execute args)]
+          (go (let [start-at (t/epoch)
+                    build-result (-execute args)]
                 (if (= 0 (build-result :exit))
                   (do
                     (println "Build succesful")
