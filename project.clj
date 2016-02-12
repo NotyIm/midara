@@ -13,6 +13,7 @@
                  [ring/ring-headers "0.1.3"]
                  [org.clojure/clojure "1.7.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [clj-time "0.11.0"]
                  ]
   :plugins [[lein-ring "0.8.11"]]
   :ring {:handler midara.routes/app}

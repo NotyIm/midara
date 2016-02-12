@@ -9,7 +9,8 @@
                 :refer [join]]
              [clojure.core.async
               :as a
-              :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]))
+              :refer [>! <! >!! <!! go chan buffer close! thread alts! alts!! timeout]]
+             [clj-time.core :as t]))
 
 (defn get-projects
   "List project in our workspace"
@@ -33,9 +34,9 @@
 
 (defn write-result
   ; write build result
-  [owner repo commit r]
+  [owner repo commit r start-at]
   (let [file (join "/" ["workspace" owner repo commit "build/midara-result.json"])]
-    (spit file (json/write-str r))))
+    (spit file (json/write-str (merge r {:start-at start-at :end-at (t/epoch)})))))
 
 (defn read-result
   "read build result"
@@ -142,6 +143,7 @@
         (println (str "creating status for" owner name commit "get result" result))
         (if (= 200 (result :status))
           (println "Fail to create status. Abandon build")
+          (def start-at (t/epoch))
           (go (let [build-result (-execute args)]
                 (if (= 0 (build-result :exit))
                   (do
@@ -152,7 +154,7 @@
                     (println "Build fail")
                     (set-status owner name commit :failure))
                 )
-                (write-result owner name commit build-result)
+                (write-result owner name commit build-result start-at)
                 ))
     )))))
 
