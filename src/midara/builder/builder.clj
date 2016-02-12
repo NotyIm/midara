@@ -124,7 +124,7 @@
     ;    source /workspace/.midara
     ; then `.main` function in `.midara` is kicked off and run
     ;(sh "docker" "run" "--rm" "-v" "/var/run/docker.sock:/var/run/docker.sock" "-v" (str workdir "/src:/workspace") "-v" "" "docker" "'source /workspace/.midara; main'" " >> " build-log " 2>&1")))
-    (def docker (if (is-trusted-build? owner repo (get-in [:sender :username]))
+    (def docker (if (is-trusted-build? owner name (get-in [:sender :username]))
       (str "docker run --rm -e REPO_COMMIT=" commit " -e REPO_OWNER=" (clojure.string/lower-case owner) " -e REPO_NAME=" (clojure.string/lower-case name) " -v /var/run/docker.sock:/var/run/docker.sock -v " workdir "/src:/workspace -v " project-dir "/env:/env -v " pwd "/resources/scripts/build:/build notyim/midara-builder:0.1 /build >> " build-log " 2>&1")
       "@TODO implement untrusted build commnand here"
       ))
