@@ -20,6 +20,13 @@
       (take 10 fs)
     )))
 
+(defn read-build-log
+  "Read build log output"
+  [workspace]
+  (let [buildlog-file (str workspace "/build/midara-build.log")]
+    (if (.exists (as-file buildlog-file)) (slurp buildlog-file) "Build is not completed yet")
+    ))
+
 (defn read-meta
   "Parse meta information"
   [f]

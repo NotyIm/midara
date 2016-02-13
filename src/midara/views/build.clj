@@ -11,7 +11,7 @@
   [owner repo rev]
   (def workspace (clojure.string/join "/" ["workspace" owner repo rev]))
   (def meta-file (str workspace "/build/hook-manifest.log"))
-  (def buildlog-file (str workspace "/build/midara-build.log"))
+  ;(def buildlog-file (str workspace "/build/midara-build.log"))
   (def hook-meta (builder/read-meta meta-file))
   (def build-result (builder/read-result owner repo rev))
   (if (empty? hook-meta)
@@ -19,9 +19,13 @@
     (layout/render
         [:section.container
           [:h5.title (str "Build " owner "/" repo ": " rev)]
-          [:p "Trigger by: " (get-in hook-meta [:head_commit :author :username])]
-          [:p "Build result: " (if (= 0 (build-result :exit)) "success" "fail")]
+          [:ul
+            [:li "Trigger by: " (get-in hook-meta [:head_commit :author :username])]
+            [:li "Start at: " (get-in build-result [:start-at])]
+            [:li "Finished at: " (get-in build-result [:start-at])]
+            [:li "Build result: " (if (= 0 (build-result :exit)) "success" "fail")]
+          ]
           [:div.example
-            [:pre.code.prettyprint.prettyprinted (slurp buildlog-file)]]
+            [:pre.code.prettyprint.prettyprinted (builder/read-build-log workspace)]]
         ]
     )))
