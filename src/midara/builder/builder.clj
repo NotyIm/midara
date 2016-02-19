@@ -71,6 +71,7 @@
   "read setting"
   [owner repo]
   (let [file (join "/" ["workspace" owner repo "setting.json"])]
+    (println file)
     (json/read-str (slurp file) :key-fn keyword)))
 
 (defn is-trusted-build?
